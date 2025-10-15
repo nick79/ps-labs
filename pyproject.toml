@@ -1,0 +1,30 @@
+[tool.ruff]
+# Lint + format the repo
+target-version = "py313"
+line-length = 100
+extend-exclude = [".venv", "venv", "dist", "build", "__pycache__"]
+
+# Core rules:
+# F (pyflakes), E/W (pycodestyle), I (import order), N (pep8-naming),
+# B (bugbear), UP (pyupgrade), SIM (simplify)
+select = ["F", "E", "W", "I", "N", "B", "UP", "SIM"]
+
+# Turn off families you likely don't want for quick scripts:
+ignore = [
+  "D",        # pydocstyle/docstrings (too heavy for small scripts)
+  "ANN",      # type-annotation enforcement
+  "COM812",   # trailing comma rules (formatter handles commas)
+  "ISC001",   # implicit string concatenation warnings (formatter interaction)
+]
+
+# Keep import sorting stable and first-party clear.
+[tool.ruff.lint.isort]
+known-first-party = ["ps-labs"]
+force-sort-within-sections = true
+
+# Ruff as formatter (black-like)
+[tool.ruff.format]
+quote-style = "double"     # optional, pick "double" or "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+docstring-code-format = true
