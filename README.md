@@ -39,4 +39,3 @@ Most scripts share flags such as `--proxy http://127.0.0.1:8080`, `--header Name
 - `src/sqli/` – SQL injection labs (`lab01.py`, `lab02.py`) plus reusable payload logic.
 - `requirements.txt` – minimal runtime and tooling dependencies.
 
-Feel free to fork and add new topics. When in doubt about naming, testing, or review process, follow the patterns documented in `AGENTS.md`.
