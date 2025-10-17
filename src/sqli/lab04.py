@@ -160,6 +160,7 @@ def find_string_column(
             base_params=base_params,
             extra_headers=headers,
             cookies=cookies,
+            success_marker=marker_string,
         )
 
         if res.success:

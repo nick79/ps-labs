@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import Final
 
 from bs4 import BeautifulSoup
 
@@ -88,13 +87,20 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def extract_admin_password(html: str, username: str) -> str | None:
     """Extract the administrator password from an HTML table."""
     soup = BeautifulSoup(html, "html.parser")
-    node = soup.find(string=username)
+    node = soup.find(string=lambda text: text and username in text)
     if not node:
         return None
+
+    text = node.strip()
+    if ":" in text:
+        user_part, _, password_part = text.partition(":")
+        if user_part.strip() == username and password_part.strip():
+            return password_part.strip()
 
     td = node.find_parent("td")
     if not td:
         return None
+
     next_td = td.find_next_sibling("td")
     if not next_td or not next_td.text:
         return None
@@ -145,7 +151,7 @@ def exploit_users_table(
     if not res.success:
         return None
 
-    return extract_admin_password(res.evidence_excerpt, username) or None
+    return extract_admin_password(res.body, username) or None
 
 
 def main(argv: list[str]) -> int:
