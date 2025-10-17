@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from src.common.http_utils import HttpConfig, build_client
+from src.common.cli_utils import build_cli_client, parse_keyvals
 from src.sqli.sqli_utils import sqli_inject
 
 
@@ -51,36 +51,20 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
-def parse_keyvals(items: list[str], sep: str) -> dict[str, str]:
-    out: dict[str, str] = {}
-    for item in items:
-        if sep not in item:
-            raise ValueError(f"Invalid format '{item}', expected KEY{sep}VALUE")
-        k, v = item.split(sep, 1)
-        out[k.strip()] = v.strip()
-
-    return out
-
-
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
 
-    proxies: dict[str, str] | None = None
-    if args.proxy:
-        proxies = {"http": args.proxy, "https": args.proxy}
-
-    cfg = HttpConfig(
-        base_url=args.url.strip(),
-        verify_tls=not args.insecure,
+    client = build_cli_client(
+        args.url,
+        proxy=args.proxy,
+        insecure=args.insecure,
         timeout=args.timeout,
-        proxies=proxies,
     )
-    client = build_client(cfg)
 
     try:
-        cookies = parse_keyvals(args.cookie, "=") if args.cookie else {}
-        extra_headers = parse_keyvals(args.header, ":") if args.header else {}
-        base_params = parse_keyvals(args.base_param, "=") if args.base_param else {}
+        cookies = parse_keyvals(args.cookie, "=")
+        extra_headers = parse_keyvals(args.header, ":")
+        base_params = parse_keyvals(args.base_param, "=")
 
         res = sqli_inject(
             client,

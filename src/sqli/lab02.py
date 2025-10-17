@@ -8,7 +8,8 @@ from typing import Final
 from bs4 import BeautifulSoup
 import requests
 
-from src.common.http_utils import HttpConfig, build_client, HttpClient
+from src.common.cli_utils import build_cli_client, parse_keyvals
+from src.common.http_utils import HttpClient
 from src.sqli.sqli_utils import sqli_inject
 
 
@@ -103,16 +104,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     return p.parse_args(argv)
 
 
-def parse_keyvals(items: list[str], sep: str) -> dict[str, str]:
-    out: dict[str, str] = {}
-    for item in items:
-        if sep not in item:
-            raise ValueError(f"Invalid format '{item}', expected KEY{sep}VALUE")
-        k, v = item.split(sep, 1)
-        out[k.strip()] = v.strip()
-    return out
-
-
 def fetch_csrf_token(client: HttpClient, login_url: str, selector: str, attr: str) -> str:
     """
     GET the login page, parse CSRF token using BeautifulSoup, return the token string.
@@ -138,18 +129,12 @@ def fetch_csrf_token(client: HttpClient, login_url: str, selector: str, attr: st
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
 
-    proxy: str | None = args.proxy
-    proxies: dict[str, str] | None = None
-    if proxy:
-        proxies = {"http": proxy, "https": proxy}
-
-    cfg = HttpConfig(
-        base_url=args.url.strip(),
-        verify_tls=not args.insecure,
+    client = build_cli_client(
+        args.url,
+        proxy=args.proxy,
+        insecure=args.insecure,
         timeout=args.timeout,
-        proxies=proxies,
     )
-    client = build_client(cfg)
 
     # Build absolute login URL
     # We deliberately use the helper's URL join behavior by calling sqli_inject later,
@@ -159,8 +144,8 @@ def main(argv: list[str]) -> int:
     login_url: str = f"{base_url}/{endpoint_path}"
 
     try:
-        cookies = parse_keyvals(args.cookie, "=") if args.cookie else {}
-        extra_headers = parse_keyvals(args.header, ":") if args.header else {}
+        cookies = parse_keyvals(args.cookie, "=")
+        extra_headers = parse_keyvals(args.header, ":")
 
         # 1) fetch CSRF token
         csrf = fetch_csrf_token(client, login_url, args.csrf_selector, args.csrf_attr)
