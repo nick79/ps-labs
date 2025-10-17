@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import Final
 
 from src.common.cli_utils import build_cli_client, parse_keyvals
 from src.common.http_utils import HttpClient
