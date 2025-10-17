@@ -15,7 +15,7 @@ class SqliResult:
     success: bool
     url: str
     status_code: int
-    elpased_s: float
+    elapsed_s: float
     evidence_excerpt: str = ""
 
 
@@ -95,6 +95,6 @@ def sqli_inject(
         success=ok,
         url=resp.url,
         status_code=resp.status_code,
-        elpased_s=resp.elapsed.total_seconds(),
+        elapsed_s=resp.elapsed.total_seconds(),
         evidence_excerpt=excerpt,
     )

