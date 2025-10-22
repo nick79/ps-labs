@@ -1,4 +1,3 @@
-# src/sqli/lab_mysql_version.py
 from __future__ import annotations
 
 import argparse
